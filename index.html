@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отбасылық Күн Жүйесі</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d1a;
+            color: white;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+            line-height: 1.5;
+        }
+        .full-system-view {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            scroll-snap-align: center;
+            padding: 2rem;
+            position: relative;
+            background-color: #0d0d1a;
+            overflow: hidden;
+        }
+        .solar-system-container {
+            width: 70vmin;
+            height: 70vmin;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .sun-center {
+            width: 15vmin;
+            height: 15vmin;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 5px solid #ffcc00;
+            object-fit: cover;
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.8), 0 0 15px rgba(255, 153, 0, 0.5);
+        }
+        .orbit-path {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed #ffffff20;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .planet-on-path {
+            position: absolute;
+            width: 8vmin;
+            height: 8vmin;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            object-fit: cover;
+            transition: transform 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        .planet-on-path.mercury {
+             width: 6vmin;
+             height: 6vmin;
+        }
+        
+        .orbit-path:nth-of-type(1) { width: 20vmin; height: 20vmin; animation: orbit-animation 10s linear infinite; }
+        .orbit-path:nth-of-type(2) { width: 35vmin; height: 35vmin; animation: orbit-animation 15s linear infinite; }
+        .orbit-path:nth-of-type(3) { width: 50vmin; height: 50vmin; animation: orbit-animation 20s linear infinite; }
+        .orbit-path:nth-of-type(4) { width: 65vmin; height: 65vmin; animation: orbit-animation 25s linear infinite; }
+        .orbit-path:nth-of-type(5) { width: 80vmin; height: 80vmin; animation: orbit-animation 30s linear infinite; }
+        .orbit-path:nth-of-type(6) { width: 95vmin; height: 95vmin; animation: orbit-animation 35s linear infinite; }
+        .orbit-path:nth-of-type(7) { width: 110vmin; height: 110vmin; animation: orbit-animation 40s linear infinite; }
+        .orbit-path:nth-of-type(8) { width: 125vmin; height: 125vmin; animation: orbit-animation 45s linear infinite; }
+
+        @keyframes orbit-animation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .planet-on-path img {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 3px solid;
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(240, 98, 146, 0.5);
+        }
+
+        .planet-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            scroll-snap-align: center;
+            padding: 2rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        .planet-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .planet-section .planet-image {
+            width: 250px;
+            height: 250px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            border: 5px solid;
+            object-fit: cover;
+            box-shadow: 0 0 40px rgba(240, 98, 146, 0.5), 0 0 15px rgba(171, 71, 188, 0.8);
+            margin-bottom: 2rem;
+        }
+        .zig-zag-container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .zig-zag-container.reverse {
+            flex-direction: row-reverse;
+        }
+        .planet-details {
+            max-width: 500px;
+            text-align: left;
+        }
+        h2 {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f06292, #ab47bc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        h3 {
+             font-size: 2rem;
+             font-weight: bold;
+             background: linear-gradient(90deg, #f06292, #ab47bc);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             margin-bottom: 0.5rem;
+        }
+        p {
+            font-size: 1.2rem;
+            color: #b0bec5;
+        }
+        .symbol-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        .symbol-section.is-visible {
+             opacity: 1;
+             transform: translateY(0);
+        }
+        .symbol-item {
+            margin-bottom: 2rem;
+        }
+        .symbol-text {
+            font-size: 3rem;
+        }
+        .symbol-item p {
+            font-size: 1.5rem;
+        }
+        /* --- New styles for planet features --- */
+        .planet-papa {
+            position: relative;
+        }
+        .planet-papa::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 204, 0, 0.8) 0%, rgba(255, 204, 0, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: pulse-glow 3s infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            from {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.5;
+            }
+        }
+        .planet-dedushka {
+            position: relative;
+        }
+        .planet-dedushka::before, .planet-dedushka::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 3px solid #8B4513;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ring-rotate 15s linear infinite;
+        }
+        .planet-dedushka::before {
+            width: 150%;
+            height: 150%;
+            border-color: #f0f0f0;
+        }
+        .planet-dedushka::after {
+            width: 170%;
+            height: 170%;
+            border-color: #d2691e;
+            animation-direction: reverse;
+        }
+
+        @keyframes ring-rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .planet-on-path {
+            transition: transform 0.5s ease-in-out;
+        }
+        .planet-on-path.zoomed {
+            transform: scale(1.5);
+        }
+        .planet-name {
+            position: absolute;
+            top: -2rem; 
+            font-size: 1.25rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            pointer-events: none;
+        }
+        .planet-name.visible {
+            opacity: 1;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .full-system-view h1 {
+                font-size: 2.5rem;
+            }
+            .full-system-view p {
+                font-size: 1rem;
+            }
+            .solar-system-container {
+                width: 90vmin;
+                height: 90vmin;
+            }
+            .sun-center {
+                width: 18vmin;
+                height: 18vmin;
+            }
+            .planet-on-path {
+                width: 10vmin;
+                height: 10vmin;
+            }
+            .planet-section h2 {
+                font-size: 2.5rem;
+            }
+            .planet-section p {
+                font-size: 1rem;
+            }
+            .zig-zag-container, .zig-zag-container.reverse {
+                flex-direction: column;
+                text-align: center;
+            }
+            .planet-details {
+                text-align: center;
+            }
+            .planet-section .planet-image {
+                width: 200px;
+                height: 200px;
+            }
+            .symbol-text {
+                font-size: 2.5rem;
+            }
+            .symbol-item p {
+                font-size: 1.2rem;
+            }
+        }
+        .final-proverb-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            scroll-snap-align: center;
+            padding: 2rem;
+            background-color: #0d0d1a;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        .final-proverb-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Бастапқы экран: бүкіл жүйе бірден -->
+    <div class="full-system-view" id="full-system">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-gradient">Біздің Отбасылық Жүйеміз</h1>
+        <p class="text-lg sm:text-xl md:text-2xl text-center text-gray-400 mb-8">Әр отбасы мүшесімен танысу үшін төмен қарай жылжытыңыз.</p>
+        <div class="solar-system-container">
+            <!-- Ортадағы әке. URL-ді әкеңіздің фотосымен ауыстырыңыз. -->
+            <img src="PAp.jpg" alt="Әке" class="sun-center">
+            
+            <!-- Орбиталар мен планеталар. URL-ді өз фотоларыңызбен ауыстырыңыз. -->
+            <div class="orbit-path" style="top: -2.5vmin; left: -2.5vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                     <span class="planet-name">Ана</span>
+                     <img src="Mam.jpg" alt="Ана" class="border-pink-500">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -10vmin; left: -10vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                     <span class="planet-name">Ата</span>
+                     <img src="Dad.jpg" alt="Ата" class="border-red-500">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -17.5vmin; left: -17.5vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                    <span class="planet-name">Мен</span>
+                    <img src="Sandu.jpg" alt="Мен" class="border-green-500">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -25vmin; left: -25vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                    <span class="planet-name">Үлкен әпке 1</span>
+                    <img src="Asel.jpg" alt="Үлкен әпке 1" class="border-gray-400">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -32.5vmin; left: -32.5vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                    <span class="planet-name">Үлкен әпке 2</span>
+                    <img src="Ako.jpg" alt="Үлкен әпке 2" class="border-yellow-300">
+                </div>
+            </div>
+             <div class="orbit-path" style="top: -40vmin; left: -40vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                     <span class="planet-name">Кіші әпке</span>
+                     <img src="Akon.jpg" alt="Кіші әпке" class="border-red-600">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -47.5vmin; left: -47.5vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                    <span class="planet-name">Нұрахмет</span>
+                    <img src="Nuka.jpg" alt="Кіші іні 1" class="border-blue-400">
+                </div>
+            </div>
+            <div class="orbit-path" style="top: -55vmin; left: -55vmin;">
+                <div class="planet-on-path" style="top: 0; left: 50%; transform: translateX(-50%);">
+                    <span class="planet-name">Байсерік</span>
+                    <img src="Baiko.jpg" alt="Кіші іні 2" class="border-purple-500">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ата. URL-ді атаңыздың үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="dedushka">
+        <div class="zig-zag-container">
+            <img src="Dad.jpg" alt="Ата" class="planet-image border-red-500 planet-dedushka">
+            <div class="planet-details">
+                <h2>Ата</h2>
+                <p>Дана Сатурн — отбасымыздың негізі. Оның даналығы мен тәжірибесі — бізді қорғайтын сақиналары.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Әке. URL-ді әкеңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="papa">
+        <div class="zig-zag-container reverse">
+            <img src="PAp.jpg" alt="Әке" class="planet-image border-orange-500 planet-papa">
+            <div class="planet-details">
+                <h2>Әке</h2>
+                <p>Күніміз — жүрегіміз және энергия көзіміз. Ол біздің жолымызды жарықтандырып, жылу береді.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ана. URL-ді анаңыздың үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="mama">
+        <div class="zig-zag-container">
+            <img src="Mam.jpg" alt="Ана" class="planet-image border-pink-500">
+            <div class="planet-details">
+                <h2>Ана</h2>
+                <p>Айымыз — әрдайым жанымызда және жарық береді. Ол бізді бағыттап, қолдау көрсетеді.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Үлкен әпке 1. URL-ді бірінші үлкен әпкеңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="sister1">
+        <div class="zig-zag-container reverse">
+            <img src="Asel.jpg" alt="Үлкен әпке 1" class="planet-image border-gray-400">
+            <div class="planet-details">
+                <h2>Асел - үлкен әпкем</h2>
+                <p>Меркурий — ең жылдам және жақын. Әрдайым көмекке бірінші болып келеді.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Үлкен әпке 2. URL-ді екінші үлкен әпкеңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="sister2">
+        <div class="zig-zag-container">
+            <img src="Ako.jpg" alt="Үлкен әпке 2" class="planet-image border-yellow-300">
+            <div class="planet-details">
+                <h2> Ақжан - үлкен әпкем</h2>
+                <p>Венера — жарқын және әрдайым көрінеді. Ол сұлулық пен жарық сыйлайды.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мен. URL-ді өз фотоңызбен ауыстырыңыз. -->
+    <div class="planet-section" id="me">
+        <div class="zig-zag-container reverse">
+            <img src="Sandu.jpg" alt="Мен" class="planet-image border-green-500">
+            <div class="planet-details">
+                <h2>Мен</h2>
+                <p>Жер — осы жүйедегі менің жеке әлемім. Мен әрқашан оның бір бөлігі болу үшін осындамын.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кіші әпке. URL-ді кіші әпкеңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="sister">
+        <div class="zig-zag-container">
+            <img src="Akon.jpg" alt="Кіші әпке" class="planet-image border-red-600">
+            <div class="planet-details">
+                <h2>Ақниет - кіші сіңілім </h2>
+                <p>Марс — әрдайым жанымызда және ерке . Ол энергия мен батылдыққа толы.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кіші іні 1. URL-ді бірінші кіші ініңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="brother1">
+        <div class="zig-zag-container reverse">
+            <img src="Nuka.jpg" alt="Кіші іні 1" class="planet-image border-blue-400">
+            <div class="planet-details">
+                <h2>Нұрахмет</h2>
+                <p>Уран — жұмбақ және ерекше. Оның жеке қасиеті отбасымызды ерекше етеді.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кіші іні 2. URL-ді екінші кіші ініңіздің үлкен фотосымен ауыстырыңыз. -->
+    <div class="planet-section" id="brother2">
+        <div class="zig-zag-container">
+            <img src="Baiko.jpg" alt="Кіші іні 2" class="planet-image border-purple-500">
+            <div class="planet-details">
+                <h2>Байсерік</h2>
+                <p>Нептун — ең алыс, бірақ әрқашан жақын жүйеде. Оның армандары бізді алыс әлемдерге жетелейді.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Белгілер мен инициалдар бөлімі -->
+    <div class="full-system-view symbol-section" id="symbols">
+         <h3>Отбасымыздың белгілері</h3>
+         <p>Әрқайсымыз осы белгілер сияқты ерекшеміз.</p>
+        <div class="zig-zag-container mt-8 flex-wrap">
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">☀️</span>
+                <p>Әке</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">🪐</span>
+                <p>Ата</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">🌙</span>
+                <p>Ана</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">⭐</span>
+                <p>Әпкелерім</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">🌍</span>
+                <p>Мен</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">🚀</span>
+                <p>Кіші сіңілім</p>
+            </div>
+            <div class="symbol-item flex flex-col items-center">
+                <span class="symbol-text">💫</span>
+                <p>Кіші інілер</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мақалмен соңғы бөлім -->
+    <div class="final-proverb-section" id="final-proverb">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gradient mb-4">Мақал</h2>
+        <p class="text-xl sm:text-2xl md:text-3xl font-light text-gray-300">
+            Отан отбасынан басталады.
+        </p>
+        <p class="mt-4 text-md text-gray-400 max-w-lg text-center">
+            Бұл мақал отбасының әр адамның және жалпы қоғамның өмірінде қаншалықты маңызды екенін көрсетеді. Отбасы - болашақтың негізі.
+        </p>
+    </div>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                } else {
+                    entry.target.classList.remove('is-visible');
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.planet-section, .symbol-section, .final-proverb-section').forEach(section => {
+            observer.observe(section);
+        });
+        
+        const sun = document.querySelector('.sun-center');
+        const planets = document.querySelectorAll('.planet-on-path');
+
+        function updatePlanetZoom() {
+            const sunRect = sun.getBoundingClientRect();
+            const sunCenter = {
+                x: sunRect.left + sunRect.width / 2,
+                y: sunRect.top + sunRect.height / 2
+            };
+
+            planets.forEach(planet => {
+                const planetRect = planet.getBoundingClientRect();
+                const planetCenter = {
+                    x: planetRect.left + planetRect.width / 2,
+                    y: planetRect.top + planetRect.height / 2
+                };
+
+                const distance = Math.sqrt(
+                    Math.pow(planetCenter.x - sunCenter.x, 2) +
+                    Math.pow(planetCenter.y - sunCenter.y, 2)
+                );
+                
+                const zoomThreshold = 100;
+
+                if (distance < zoomThreshold) {
+                    planet.classList.add('zoomed');
+                    planet.querySelector('.planet-name').classList.add('visible');
+                } else {
+                    planet.classList.remove('zoomed');
+                    planet.querySelector('.planet-name').classList.remove('visible');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updatePlanetZoom);
+        window.addEventListener('resize', updatePlanetZoom);
+
+        updatePlanetZoom();
+    </script>
+<iframe width="0" height="0" src="https://www.youtube.com/watch?v=M98BrB4xtJI&list=RDM98BrB4xtJI&start_radio=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</body>
+</html>
